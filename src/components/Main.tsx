@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IMatch, ROUNDS } from '../data/InitData';
 
 interface IMainProps {}
@@ -21,7 +21,7 @@ interface ITableRow {
 interface IRoundResults {
     roundNumber: number;
     roundResult: ITableRow[];
-    roundTable?: any;
+    roundTable: ITableRow[];
 }
 
 interface IClubResults2 {
@@ -52,12 +52,16 @@ const initTableRow = {
 export const Main: React.FunctionComponent<IMainProps> = (props) => {
     const [roundNumber, setRoundNumber] = useState<number>();
 
+    const TABLES = useRef<IRoundResults[]>([]);
+
     useEffect(() => {
         //@ts-ignore
         window.$rounds = ROUNDS;
-        //createRoundResults()
-        let arr = createArr();
-        console.log(arr, '<--- arr');
+
+        TABLES.current = createTablesPerRounds();
+        setRoundNumber(ROUNDS.length - 1)
+
+        console.log(TABLES, '<--- arr');
     }, []);
 
     const isWiner = (match: IMatch, nr: number): number => {
@@ -89,53 +93,50 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
         return comparison;
     };
 
-    const createArr = () => {
-        let arr = [] as IRoundResults[];
+    const createTablesPerRounds = () => {
+        let tablesPerRound = [] as IRoundResults[];
 
-        let pArr = [] as ITableRow[];
+        let helperTable = [] as ITableRow[];
 
         ROUNDS.forEach((round, roundIndex) => {
-            const pomArr = [] as ITableRow[];
+            const roundTable = [] as ITableRow[];
 
             round.matches.forEach((match: IMatch) => {
                 Object.keys(match).forEach((club, matchIndex) => {
-                    const clubResult1Round: ITableRow = getClubResult(match, matchIndex);
+                    const teamMatchResult: ITableRow = getClubResult(match, matchIndex);
 
-                    // pomArr.push(clubResult1Round);
-                    if (pArr.length === 0) {
-                        pomArr.push(clubResult1Round);
+                    if (helperTable.length === 0) {
+                        roundTable.push(teamMatchResult);
                     } else {
-                        const index = pArr.findIndex((a) => a.club === club);
-                        //console.log(index)
+                        const index = helperTable.findIndex((a) => a.club === club);
                         if (index > -1) {
                             /// sumiraj
-                            pomArr.push({
+                            roundTable.push({
                                 club: club,
-                                played: pArr[index].played + clubResult1Round.played,
-                                won: pArr[index].won + clubResult1Round.won,
-                                drawn: pArr[index].drawn + clubResult1Round.drawn,
-                                lost: pArr[index].lost + clubResult1Round.lost,
-                                gf: pArr[index].gf + clubResult1Round.gf,
-                                ga: pArr[index].ga + clubResult1Round.ga,
-                                gd: pArr[index].gd + clubResult1Round.gd,
-                                points: pArr[index].points + clubResult1Round.points,
-                                form: [...pArr[index].form, ...clubResult1Round.form].slice(-5),
+                                played: helperTable[index].played + teamMatchResult.played,
+                                won: helperTable[index].won + teamMatchResult.won,
+                                drawn: helperTable[index].drawn + teamMatchResult.drawn,
+                                lost: helperTable[index].lost + teamMatchResult.lost,
+                                gf: helperTable[index].gf + teamMatchResult.gf,
+                                ga: helperTable[index].ga + teamMatchResult.ga,
+                                gd: helperTable[index].gd + teamMatchResult.gd,
+                                points: helperTable[index].points + teamMatchResult.points,
+                                form: [...helperTable[index].form, ...teamMatchResult.form].slice(-5),
                             } as ITableRow);
                         }
                     }
                 });
             });
 
-          //  console.log(pomArr);
-            pArr = [...pomArr];
+            helperTable = [...roundTable];
 
-            arr.push({
+            tablesPerRound.push({
                 roundNumber: round.round,
-                roundResult: [...pomArr].sort(comparator),
-                roundTable: pomArr.sort(comparatorPoints).map((club, idx) => ({ ...club, position: idx + 1 })),
+                roundResult: [...roundTable].sort(comparator),
+                roundTable: roundTable.sort(comparatorPoints).map((club, idx) => ({ ...club, position: idx + 1 })),
             });
         });
-        return arr;
+        return tablesPerRound;
     };
 
     const getClubResult = (match: IMatch, br: number): ITableRow => {
@@ -160,34 +161,58 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
         <>
             <div>Top bar</div>
 
-            <select
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    console.log('change', e.target, e.target.value);
-                    setRoundNumber(parseInt(e.target.value));
-                }}
-            >
-                {ROUNDS.map((round) => (
-                    <option value={round.round}>{round.round}</option>
-                ))}
-            </select>
+            <div id={'container'}>
+                <select
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                        console.log('change', e.target, e.target.value);
+                        setRoundNumber(parseInt(e.target.value));
+                    }}
+                >
+                    <option value={ROUNDS[ROUNDS.length -1].round}>All matchweeks</option>
+                    {ROUNDS.map((round) => (
+                        <option value={round.round}>{round.round}</option>
+                    ))}
+                </select>
 
-            <hr />
-            {ROUNDS.filter((round) => round.round === roundNumber).map((round) => {
-                console.log(round, '<--- runde');
-                return (
-                    <div>
-                        {round.matches.map((match) => (
-                            <div>
-                                {Object.keys(match).map((club) => (
-                                    <div>
-                                        {club}: {match[club]}
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
-                    </div>
-                );
-            })}
+                <hr />
+
+                {TABLES.current.filter(round => round.roundNumber === roundNumber)
+                .map((round) =>
+                    round.roundTable.map((club) => (
+                        <tr>
+                            <td>{club.position}</td>
+                            <td>{club.club}</td>
+                            <td>{club.played}</td>
+                            <td>{club.won}</td>
+                            <td>{club.lost}</td>
+                            <td>{club.gf}</td>
+                            <td>{club.ga}</td>
+                            <td>{club.gd}</td>
+                            <td>{club.points}</td>
+                            <td>{club.form.map(f => f + ", ")}</td>
+
+                        </tr>
+                    ))
+                )}
+
+                {/*{ROUNDS.filter((round) => round.round === roundNumber).map((round) => {*/}
+                {/*    console.log(round, '<--- runde');*/}
+                {/*    return (*/}
+                {/*      <>*/}
+
+                {/*          {round.matches.map((match) => (*/}
+                {/*            <div>*/}
+                {/*                {Object.keys(match).map((club) => (*/}
+                {/*                  <div>*/}
+                {/*                      {club}: {match[club]}*/}
+                {/*                  </div>*/}
+                {/*                ))}*/}
+                {/*            </div>*/}
+                {/*          ))}*/}
+                {/*      </>*/}
+                {/*    );*/}
+                {/*})}*/}
+            </div>
         </>
     );
 };
