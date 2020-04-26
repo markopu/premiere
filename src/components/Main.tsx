@@ -10,6 +10,10 @@ interface IMainProps {}
 
 const Container = styled.div`
     margin: 0 1rem;
+    display: flex;
+    @media (max-width: 768px) {
+      flex-direction: column;
+  }
 `;
 
 const Select = styled.select`
@@ -28,6 +32,28 @@ const TopBar = styled.div`
     padding: 0 1rem;
     display: flex;
     align-items: center;
+`;
+
+const RResult = styled.div`
+    margin-top: 1rem;
+
+`;
+
+const RResultHeader = styled.div`
+    background-color: ghostwhite;
+    font-size: .8rem;
+    line-height: 2.4rem;
+    padding: 0 1rem;
+`;
+const RResultList = styled.div`
+    margin: 1rem;
+
+`;
+
+const RResultItem = styled.div`
+  width: 200px;
+  text-align: left;
+  margin-bottom: .5rem;
 `;
 
 export const Main: React.FunctionComponent<IMainProps> = (props) => {
@@ -62,6 +88,27 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
             </TopBar>
 
             <Container>
+              <RResult >
+                <RResultHeader > Round {roundNumber} results</RResultHeader>
+                {ROUNDS.filter((round) => round.round === roundNumber).map((round) => {
+                  console.log(round, '<--- runde');
+                  return (
+                    <RResultList>
+                      {round.matches.map((match: IMatch) => (
+                        <RResultItem >
+                          {Object.keys(match).map((club) => (
+                            <div>
+                              {club}: <b>{match[club]}</b>
+                            </div>
+                          ))}
+                        </RResultItem>
+                      ))}
+                    </RResultList>
+                  );
+                })}
+              </RResult>
+
+
                 <RoundsTable roundNumber={roundNumber as number} tables={TABLES.current} />
             </Container>
         </>

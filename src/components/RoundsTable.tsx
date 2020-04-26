@@ -1,24 +1,24 @@
-import * as React from "react";
-import { IRoundResults, ITableRow } from "../data/prepareData";
-import styled from "styled-components";
+import * as React from 'react';
+import { IRoundResults, ITableRow } from '../data/prepareData';
+import styled from 'styled-components';
 
 interface IRoundsTableProps {
-  roundNumber: number
-  tables: IRoundResults[]
-};
+    roundNumber: number;
+    tables: IRoundResults[];
+}
 
 const initTableRow = {
-  position: 0,
-  club: '',
-  played: 0,
-  won: 0,
-  drawn: 0,
-  lost: 0,
-  gf: 0,
-  ga: 0,
-  gd: 0,
-  points: 0,
-  form: [],
+    position: 0,
+    club: '',
+    played: 0,
+    won: 0,
+    drawn: 0,
+    lost: 0,
+    gf: 0,
+    ga: 0,
+    gd: 0,
+    points: 0,
+    form: [],
 } as ITableRow;
 
 type ThProps = {};
@@ -39,10 +39,8 @@ const Table = styled.table`
     margin-top: 1rem;
 `;
 
-
-
 type IFormItemProps = {
-  backgroundColor: string;
+    backgroundColor: string;
 };
 
 const FormItem = styled.div<IFormItemProps>`
@@ -63,6 +61,22 @@ const Td = styled.td`
     text-align: center;
     line-height: 3rem;
     border-bottom: 1px gainsboro solid;
+    @media (max-width: 768px) {
+        line-height: 1rem;
+        padding: 0.5rem 0;
+    }
+`;
+
+const TdResp = styled(Td)`
+    @media (max-width: 768px) {
+        display: none;
+    }
+`;
+
+const ThResp = styled(Th)`
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 const ThLeft = styled(Th)`
@@ -70,57 +84,63 @@ const ThLeft = styled(Th)`
 `;
 
 const getBGColor = (result: string) => {
-  switch (result) {
-    case 'W':
-      return 'green';
-      break;
-    case 'D':
-      return 'gray';
-      break;
-    case 'L':
-      return 'red';
-    default:
-      return '';
-  }
+    switch (result) {
+        case 'W':
+            return 'green';
+            break;
+        case 'D':
+            return 'gray';
+            break;
+        case 'L':
+            return 'red';
+        default:
+            return '';
+    }
 };
 
-
 export const RoundsTable: React.FunctionComponent<IRoundsTableProps> = (props) => {
-  return (
-    <>
-
-      <Table>
-        <TrHead>
-          {Object.keys(initTableRow).map((team) =>
-            team === 'club' ? <ThLeft>{team}</ThLeft> : <Th>{team}</Th>
-          )}
-        </TrHead>
-        <tbody>
-        {props.tables
-        .filter((round) => round.roundNumber === props.roundNumber)
-        .map((round) =>
-          round.roundTable.map((club) => (
-            <tr>
-              <Td>{club.position}</Td>
-              <Td style={{ textAlign: 'left' }}>{club.club}</Td>
-              <Td>{club.played}</Td>
-              <Td>{club.won}</Td>
-              <Td>{club.drawn}</Td>
-              <Td>{club.lost}</Td>
-              <Td>{club.gf}</Td>
-              <Td>{club.ga}</Td>
-              <Td>{club.gd}</Td>
-              <Td>{club.points}</Td>
-              <Td>
-                {club.form.map((result) => (
-                  <FormItem backgroundColor={getBGColor(result)}>{result}</FormItem>
-                ))}
-              </Td>
-            </tr>
-          ))
-        )}
-        </tbody>
-      </Table>
-    </>
-  );
+    return (
+        <>
+            <Table>
+                <TrHead>
+                    <Th>Position</Th>
+                    <ThLeft>Club</ThLeft>
+                    <Th>{'Played'}</Th>
+                    <Th>{'Won'}</Th>
+                    <Th>{'Drawn'}</Th>
+                    <Th>{'Lost'}</Th>
+                    <ThResp>{'GF'}</ThResp>
+                    <ThResp>{'GA'}</ThResp>
+                    <Th>{'GD'}</Th>
+                    <Th>{'Points'}</Th>
+                    <ThResp>{'Form'}</ThResp>
+                </TrHead>
+                <tbody>
+                    {props.tables
+                        .filter((round) => round.roundNumber === props.roundNumber)
+                        .map((round) =>
+                            round.roundTable.map((club) => (
+                                <tr>
+                                    <Td>{club.position}</Td>
+                                    <Td style={{ textAlign: 'left' }}>{club.club}</Td>
+                                    <Td>{club.played}</Td>
+                                    <Td>{club.won}</Td>
+                                    <Td>{club.drawn}</Td>
+                                    <Td>{club.lost}</Td>
+                                    <TdResp>{club.gf}</TdResp>
+                                    <TdResp>{club.ga}</TdResp>
+                                    <Td>{club.gd}</Td>
+                                    <Td>{club.points}</Td>
+                                    <TdResp>
+                                        {club.form.map((result) => (
+                                            <FormItem backgroundColor={getBGColor(result)}>{result}</FormItem>
+                                        ))}
+                                    </TdResp>
+                                </tr>
+                            ))
+                        )}
+                </tbody>
+            </Table>
+        </>
+    );
 };
