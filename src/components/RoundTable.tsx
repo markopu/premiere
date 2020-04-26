@@ -98,7 +98,7 @@ const getBGColor = (result: string) => {
     }
 };
 
-export const RoundsTable: React.FunctionComponent<IRoundsTableProps> = (props) => {
+export const RoundTable: React.FunctionComponent<IRoundsTableProps> = (props) => {
     return (
         <>
             <Table>

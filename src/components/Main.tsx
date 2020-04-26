@@ -4,7 +4,8 @@ import { IMatch, ROUNDS } from '../data/InitData';
 import styled from 'styled-components';
 import { createTablesPerRounds, IRoundResults, ITableRow } from '../data/prepareData';
 import logo from '../style/logo.svg';
-import { RoundsTable } from './RoundsTable';
+import { RoundTable } from './RoundTable';
+import { RoundResult } from "./RoundResult";
 
 interface IMainProps {}
 
@@ -34,27 +35,11 @@ const TopBar = styled.div`
     align-items: center;
 `;
 
-const RResult = styled.div`
-    margin-top: 1rem;
-
+const Img = styled.img`
+  height: 3rem;
+  margin: .25rem 0;
 `;
 
-const RResultHeader = styled.div`
-    background-color: ghostwhite;
-    font-size: .8rem;
-    line-height: 2.4rem;
-    padding: 0 1rem;
-`;
-const RResultList = styled.div`
-    margin: 1rem;
-
-`;
-
-const RResultItem = styled.div`
-  width: 200px;
-  text-align: left;
-  margin-bottom: .5rem;
-`;
 
 export const Main: React.FunctionComponent<IMainProps> = (props) => {
     const [roundNumber, setRoundNumber] = useState<number>();
@@ -62,19 +47,15 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
     const TABLES = useRef<IRoundResults[]>([]);
 
     useEffect(() => {
-        //@ts-ignore
-        window.$rounds = ROUNDS;
 
         TABLES.current = createTablesPerRounds();
         setRoundNumber(ROUNDS.length);
-
-        console.log(TABLES, '<--- arr');
     }, []);
 
     return (
         <>
             <TopBar>
-                <img style={{ height: '48px', margin: '4px 0' }} src={logo} />
+                <Img src={logo} />
                 <Select
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                         setRoundNumber(parseInt(e.target.value));
@@ -88,28 +69,9 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
             </TopBar>
 
             <Container>
-              <RResult >
-                <RResultHeader > Round {roundNumber} results</RResultHeader>
-                {ROUNDS.filter((round) => round.round === roundNumber).map((round) => {
-                  console.log(round, '<--- runde');
-                  return (
-                    <RResultList>
-                      {round.matches.map((match: IMatch) => (
-                        <RResultItem >
-                          {Object.keys(match).map((club) => (
-                            <div>
-                              {club}: <b>{match[club]}</b>
-                            </div>
-                          ))}
-                        </RResultItem>
-                      ))}
-                    </RResultList>
-                  );
-                })}
-              </RResult>
 
-
-                <RoundsTable roundNumber={roundNumber as number} tables={TABLES.current} />
+                <RoundResult roundNumber={roundNumber as number}/>
+                <RoundTable roundNumber={roundNumber as number} tables={TABLES.current} />
             </Container>
         </>
     );
