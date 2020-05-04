@@ -48,11 +48,11 @@ export interface IRoundResults {
     comparison = 1;
   } else {
 
-    if (a.gd > b.gd) return 1;
-    else if (a.gd < b.gd) return -1
+    if (a.gd > b.gd) return -1;
+    else if (a.gd < b.gd) return 1
 
     else {
-     if (a.gf > b.gf)  return 1;
+     if (a.gf > b.gf)  return -1;
      else if (a.gf < b.gf) return 1;
     }
 
