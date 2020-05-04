@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { IRoundResults, ITableRow } from '../data/prepareData';
+import { getTableForRound, IRoundResults, ITableRow } from '../data/prepareData';
 import styled from 'styled-components';
 
 interface IRoundsTableProps {
     roundNumber: number;
-    tables: IRoundResults[];
 }
 
 const initTableRow = {
@@ -116,29 +115,28 @@ export const RoundTable: React.FunctionComponent<IRoundsTableProps> = (props) =>
                     <ThResp>{'Form'}</ThResp>
                 </TrHead>
                 <tbody>
-                    {props.tables
-                        .filter((round) => round.roundNumber === props.roundNumber)
-                        .map((round) =>
-                            round.roundTable.map((club) => (
-                                <tr>
-                                    <Td>{club.position}</Td>
-                                    <Td style={{ textAlign: 'left' }}>{club.club}</Td>
-                                    <Td>{club.played}</Td>
-                                    <Td>{club.won}</Td>
-                                    <Td>{club.drawn}</Td>
-                                    <Td>{club.lost}</Td>
-                                    <TdResp>{club.gf}</TdResp>
-                                    <TdResp>{club.ga}</TdResp>
-                                    <Td>{club.gd}</Td>
-                                    <Td>{club.points}</Td>
-                                    <TdResp>
-                                        {club.form.map((result) => (
-                                            <FormItem backgroundColor={getBGColor(result)}>{result}</FormItem>
-                                        ))}
-                                    </TdResp>
-                                </tr>
-                            ))
-                        )}
+                    {/*{props.tables*/}
+                    {/*    .filter((round) => round.roundNumber === props.roundNumber)*/}
+                    {/*    .map((round) =>*/}
+                    {getTableForRound(props.roundNumber).map((club) => (
+                        <tr>
+                            <Td>{club.position}</Td>
+                            <Td style={{ textAlign: 'left' }}>{club.club}</Td>
+                            <Td>{club.played}</Td>
+                            <Td>{club.won}</Td>
+                            <Td>{club.drawn}</Td>
+                            <Td>{club.lost}</Td>
+                            <TdResp>{club.gf}</TdResp>
+                            <TdResp>{club.ga}</TdResp>
+                            <Td>{club.gd}</Td>
+                            <Td>{club.points}</Td>
+                            <TdResp>
+                                {club.form.map((result) => (
+                                    <FormItem backgroundColor={getBGColor(result)}>{result}</FormItem>
+                                ))}
+                            </TdResp>
+                        </tr>
+                    ))}
                 </tbody>
             </Table>
         </>

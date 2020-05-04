@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { IMatch, ROUNDS } from '../data/InitData';
+import { useState } from 'react';
+import { ROUNDS } from '../data/InitData';
 import styled from 'styled-components';
-import { createTablesPerRounds, IRoundResults, ITableRow } from '../data/prepareData';
 import logo from '../style/logo.svg';
 import { RoundTable } from './RoundTable';
 import { RoundResult } from "./RoundResult";
@@ -42,15 +41,7 @@ const Img = styled.img`
 
 
 export const Main: React.FunctionComponent<IMainProps> = (props) => {
-    const [roundNumber, setRoundNumber] = useState<number>();
-
-    const TABLES = useRef<IRoundResults[]>([]);
-
-    useEffect(() => {
-
-        TABLES.current = createTablesPerRounds();
-        setRoundNumber(ROUNDS.length);
-    }, []);
+    const [roundNumber, setRoundNumber] = useState<number>(ROUNDS.length);
 
     return (
         <>
@@ -70,8 +61,8 @@ export const Main: React.FunctionComponent<IMainProps> = (props) => {
 
             <Container>
 
-                <RoundResult roundNumber={roundNumber as number}/>
-                <RoundTable roundNumber={roundNumber as number} tables={TABLES.current} />
+                <RoundResult roundNumber={roundNumber}/>
+                <RoundTable roundNumber={roundNumber}  />
             </Container>
         </>
     );

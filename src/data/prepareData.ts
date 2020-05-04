@@ -123,3 +123,53 @@ export const getClubResult = (match: IMatch, br: number): ITableRow => {
   obj.form = [Boolean(obj.won) ? 'W' : Boolean(obj.drawn) ? 'D' : 'L'];
   return obj;
 };
+
+
+export const getTableForRound = (round : number) => {
+  let tablesPerRound = [] as IRoundResults[];
+  let tableForRound = [] as ITableRow[];
+
+  let helperTable = [] as ITableRow[];
+
+  ROUNDS.slice(0,round).forEach((round, roundIndex) => {
+    const roundTable = [] as ITableRow[];
+
+    round.matches.forEach((match: IMatch) => {
+      Object.keys(match).forEach((club, matchIndex) => {
+        const teamMatchResult: ITableRow = getClubResult(match, matchIndex);
+
+        if (helperTable.length === 0) {
+          roundTable.push(teamMatchResult);
+        } else {
+          const index = helperTable.findIndex((a) => a.club === club);
+          if (index > -1) {
+            /// sumiraj
+            roundTable.push({
+              club: club,
+              played: helperTable[index].played + teamMatchResult.played,
+              won: helperTable[index].won + teamMatchResult.won,
+              drawn: helperTable[index].drawn + teamMatchResult.drawn,
+              lost: helperTable[index].lost + teamMatchResult.lost,
+              gf: helperTable[index].gf + teamMatchResult.gf,
+              ga: helperTable[index].ga + teamMatchResult.ga,
+              gd: helperTable[index].gd + teamMatchResult.gd,
+              points: helperTable[index].points + teamMatchResult.points,
+              form: [...helperTable[index].form, ...teamMatchResult.form].slice(-5),
+            } as ITableRow);
+          }
+        }
+      });
+    });
+
+    helperTable = [...roundTable];
+
+    tableForRound = roundTable.sort(comparatorPoints).map((club, idx) => ({ ...club, position: idx + 1 }));
+
+    // tablesPerRound.push({
+    //   roundNumber: round.round,
+    //   roundResult: [...roundTable].sort(comparator),
+    //   roundTable: roundTable.sort(comparatorPoints).map((club, idx) => ({ ...club, position: idx + 1 })),
+    // });
+  });
+  return tableForRound;
+};
